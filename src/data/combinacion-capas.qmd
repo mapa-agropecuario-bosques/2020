@@ -342,7 +342,7 @@ leaflet() |>
   setView(lng = -84.19452,
           lat = 9.572735,
           zoom = 7) |>
-  addProviderTiles(providers$Stadia.StamenTonerLite, group = "Mapa básico (Stamen)") |>
+  addProviderTiles(providers$CartoDB.PositronNoLabels, group = "Mapa básico (Carto)") |>
   addTiles(group = "Mapa general (OSM)") |>
   addProviderTiles(providers$Esri.WorldImagery,
                    group = "Imágenes satelitales (ESRI)") |>
@@ -434,7 +434,7 @@ leaflet() |>
   ) |>  
   addLayersControl(
     baseGroups = c(
-      "Mapa básico (Stamen)",
+      "Mapa básico (Carto)",
       "Mapa general (OSM)",
       "Imágenes satelitales (ESRI)"
     ),
