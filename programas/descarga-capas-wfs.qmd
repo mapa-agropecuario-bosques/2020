@@ -1,0 +1,249 @@
+---
+title: "Descarga de capas WFS"
+format: 
+  html:
+    lang: es
+    theme: cosmo
+    toc: true
+    toc-expand: 3
+---
+
+# Introducción
+Este documento computacional procesa una lista de capas geoespaciales en servicios WFS y las descarga como archivos.
+
+El código fuente de este documento está disponible en [https://github.com/mapa-agropecuario-bosques/2020/blob/main/src/data/descarga-capas-wfs.qmd](https://github.com/mapa-agropecuario-bosques/2020/blob/main/src/data/descarga-capas-wfs.qmd).
+
+```{r}
+#| label: carga-paquetes
+#| echo: false
+#| message: false
+
+# Paquetes
+library(here)
+library(readr)
+library(dplyr)
+library(purrr)
+library(DT)
+library(sf)
+```
+
+# Parámetros generales
+
+```{r}
+#| label: paramaetros-generales
+#| code-fold: show
+#| code-summary: "Código para la definición de parámetros generales"
+
+# Archivo con la lista de capas WFS
+ARCHIVO_LISTA_CAPAS_WFS <- here("data", "raw", "capas-wfs.csv")
+
+# Directorio de capas WFS descargadas
+DIRECTORIO_CAPAS_WFS <- here("data", "interim", "capas-wfs")
+```
+
+Las rutas especificadas se basan en la estructura de directorios para proyectos de ciencia de datos propuesta por la iniciativa [Cookiecutter Data Science](http://drivendata.github.io/cookiecutter-data-science/).
+
+# Lista de capas WFS a descargar
+
+::: {.callout-note title="Archivo con la lista de capas WFS"}
+`r ARCHIVO_LISTA_CAPAS_WFS`
+:::
+
+Se descargan solamente las capas con valor `S` o `s` en la columna `descargable`.
+
+```{r}
+#| label: carga-lista-capas-wfs-a-descargar
+#| message: false
+#| code-fold: true
+#| code-summary: "Código para la carga de la lista de capas WFS a descargar"
+
+# Carga de la lista de capas WFS a descargar
+lista_capas_wfs_a_descargar <- 
+  read_csv(ARCHIVO_LISTA_CAPAS_WFS) |>
+  filter(tolower(descargable) == "s")
+```
+
+```{r}
+#| label: tabla-lista-capas-wfs-a-descargar
+#| warning: false
+#| message: false
+#| code-fold: true
+#| code-summary: "Código para el despliegue de la tabla con la lista de capas WFS a descargar"
+
+
+# Tabla con la lista de capas WFS a descargar
+lista_capas_wfs_a_descargar |>
+  arrange(grupo, nombre) |>
+  datatable(
+    rownames = FALSE,
+    extensions = c("Buttons"),
+    options = list(
+      searchHighlight = TRUE,
+      pageLength = 5,
+      language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json'),
+      dom = 'Bfrtlip',
+      buttons = list(
+        list(extend='copy', text='Copiar'),
+        list(extend='print', text='Imprimir'),
+        list(
+          extend = 'collection',
+          buttons = list(
+            list(
+              extend='csv', 
+              title="Lista de capas WFS a descargar",
+              text='CSV'
+            ),
+            list(
+              extend='excel', 
+              title="Lista de capas WFS a descargar",
+              text='Excel'
+            ),
+            list(
+              extend='pdf', 
+              title="Lista de capas WFS a descargar",
+              text='PDF'
+            )
+          ), 
+          text = 'Descargar'
+        )
+      )
+    ),
+    caption = "Lista de capas WFS a descargar"
+  )
+```
+
+::: {.callout-note title="Cantidad de capas WFS a descargar"}
+`r nrow(lista_capas_wfs_a_descargar)`
+:::
+
+# Descarga de capas WFS
+
+```{r}
+#| label: descarga-capas-wfs
+#| warning: false
+#| message: false
+#| code-fold: true
+#| code-summary: "Descarga de capas WFS"
+
+
+for (i in 1:nrow(lista_capas_wfs_a_descargar)) {
+  # Nombre de la capa
+  nombre_capa <- lista_capas_wfs_a_descargar$nombre[i]
+  
+  # URL base del servicio WFS
+  wfs_url_base <- URLencode(lista_capas_wfs_a_descargar$wfs_base[i])
+  
+  # Capa WFS
+  wfs_capa <- URLencode(lista_capas_wfs_a_descargar$wfs_capa[i])
+  
+  # Versión del servicio WFS
+  wfs_version <- lista_capas_wfs_a_descargar$wfs_version[i]
+
+  # Archivo de salida
+  archivo_salida <- lista_capas_wfs_a_descargar$archivo_salida[i]  
+    
+  # Solicitud WFS (con versión)
+  wfs_solicitud <- 
+   sprintf(
+     "request=GetFeature&service=WFS&version=%s&typename=%s&outputFormat=application/json",
+     wfs_version,
+     wfs_capa
+   )
+  
+  # Solicitud WFS (sin versión)
+  # wfs_solicitud <- 
+  #   sprintf(
+  #     "request=GetFeature&service=WFS&typename=%s&outputFormat=application/json",
+  #     wfs_capa
+  #   )  
+  
+  # Impresión del nombre de la capa
+  print(sprintf("%s", nombre_capa))
+  
+  # Carga de la caoa en objeto sf
+  capa_sf <- st_read(paste0(wfs_url_base, "?", wfs_solicitud))
+  
+  # Escritura de la capa en archivo de salida
+  capa_sf |>
+    st_write(
+      paste0(
+        DIRECTORIO_CAPAS_WFS, "/", archivo_salida
+      ),
+      delete_dsn = TRUE
+    )
+}
+```
+
+# Lista de archivos de capas WFS descargadas
+La lista incluye todos los archivos `GPKG` presentes en el directorio ``r DIRECTORIO_CAPAS_WFS``, incluyendo los que han sido descargados previamente.
+
+```{r}
+#| label: carga-lista-archivos-capas-wfs-descargadas
+#| message: false
+#| code-fold: true
+#| code-summary: "Código para la carga de la lista de archivos de capas WFS descargadas"
+
+# Nombres de archivos de capas WFS descargadas
+nombres_archivos_capas_wfs_descargadas <- list.files(
+  DIRECTORIO_CAPAS_WFS, 
+  pattern = "\\.gpkg$", 
+  full.names = TRUE
+)
+
+# Dataframe con los nombres de los archivos
+lista_archivos_capas_wfs_descargadas <- 
+  data.frame(archivo = nombres_archivos_capas_wfs_descargadas)
+```
+
+```{r}
+#| label: tabla-lista-archivos-capas-wfs-descargadas
+#| warning: false
+#| message: false
+#| code-fold: true
+#| code-summary: "Código para el despliegue de la tabla con la lista de archivos de capas WFS descargadas"
+
+
+# Tabla con la lista de archivos de capas WFS descargadas
+lista_archivos_capas_wfs_descargadas |>
+  arrange(archivo) |>
+  datatable(
+    rownames = FALSE,
+    extensions = c("Buttons"),
+    options = list(
+      searchHighlight = TRUE,
+      pageLength = 5,
+      language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json'),
+      dom = 'Bfrtlip',
+      buttons = list(
+        list(extend='copy', text='Copiar'),
+        list(extend='print', text='Imprimir'),
+        list(
+          extend = 'collection',
+          buttons = list(
+            list(
+              extend='csv', 
+              title="Lista de archivos de capas WFS descargadas",
+              text='CSV'
+            ),
+            list(
+              extend='excel', 
+              title="Lista de archivos de capas WFS descargadas",
+              text='Excel'
+            ),
+            list(
+              extend='pdf', 
+              title="Lista de archivos de capas WFS descargadas",
+              text='PDF'
+            )
+          ), 
+          text = 'Descargar'
+        )
+      )
+    ),
+    caption = "Lista de archivos de capas WFS descargadas"
+  )
+```
+
+::: {.callout-note title="Total de archivos de capas WFS descargadas"}
+`r nrow(lista_archivos_capas_wfs_descargadas)`
+:::

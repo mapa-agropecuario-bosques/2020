@@ -1,0 +1,743 @@
+---
+title: "Combinación de capas"
+format: 
+  html:
+    lang: es
+    theme: cosmo
+    toc: true
+    toc-expand: 3
+---
+
+# Introducción
+Este documento computacional combina capas de diferentes tipos de cultivos en una única capa raster.
+
+```{r}
+#| label: carga-paquetes
+#| message: false
+#| code-fold: show
+#| code-summary: "Código para la carga de paquetes"
+ 
+
+# Paquetes
+library(here)
+library(dplyr)
+library(sf)
+library(terra)
+library(leaflet)
+library(leaflet.extras)
+library(leafem)
+```
+
+# Parámetros generales
+
+```{r}
+#| label: parametros-generales
+#| code-fold: show
+#| code-summary: "Código para la definición de parámetros generales"
+
+
+# Directorio de capas WFS descargadas
+DIRECTORIO_CAPAS_WFS <- 
+  here("data", "interim", "capas-wfs")
+
+# Directorio de capas archivos vectoriales
+DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES <- 
+  here("data", "interim", "capas-archivos-vectoriales")
+
+# Archivo vectorial de Costa Rica
+ARCHIVO_VECTORIAL_COSTARICA <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "costarica.gpkg")
+
+# Archivo vectorial de áreas silvestres protegidas (ASP)
+ARCHIVO_VECTORIAL_ASP <- 
+  here(DIRECTORIO_CAPAS_WFS, "areas-silvestres-protegidas.gpkg")
+
+# Archivo vectorial de patrimonio natural del estado (PNE)
+ARCHIVO_VECTORIAL_PNE <- 
+  here(DIRECTORIO_CAPAS_WFS, "patrimonio-natural-estado.gpkg")
+
+# Archivo vectorial de registro nacional de humedales (RNH)
+ARCHIVO_VECTORIAL_RNH <- 
+  here(DIRECTORIO_CAPAS_WFS, "registro-nacional-humedales.gpkg")
+
+# Archivo vectorial de cultivos
+ARCHIVO_VECTORIAL_CULTIVOS <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "cultivos-2017.gpkg")
+
+# Archivo vectorial de cultivo de piña
+ARCHIVO_VECTORIAL_PINA <- 
+  here(DIRECTORIO_CAPAS_WFS, "cultivo-pina-2019.gpkg")
+
+# Archivo vectorial de cultivo de palma
+ARCHIVO_VECTORIAL_PALMA <- 
+  here(DIRECTORIO_CAPAS_WFS, "cultivo-palma-2019.gpkg")
+
+# Archivo vectorial de pastos 2019
+ARCHIVO_VECTORIAL_PASTOS_2019 <- 
+  here(DIRECTORIO_CAPAS_WFS, "cultivo-pastos-2019.gpkg")
+
+# Archivo vectorial de pastos 2020
+ARCHIVO_VECTORIAL_PASTOS_2020 <- 
+  here(DIRECTORIO_CAPAS_WFS, "cultivo-pastos-2020.gpkg")
+
+# Archivo vectorial de café 2017-2018
+ARCHIVO_VECTORIAL_CAFE <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "cultivo-cafe-2017-2018.gpkg")
+
+# Archivo vectorial de banano
+ARCHIVO_VECTORIAL_BANANO <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "fincas_Bananeras.shp")
+
+# Archivo vectorial de caña 2020
+ARCHIVO_VECTORIAL_CANA_2020 <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "cultivo-cana-2020.gpkg")
+
+# Archivo vectorial de cobertura forestal
+ARCHIVO_VECTORIAL_COBERTURA_FORESTAL <- 
+  here(DIRECTORIO_CAPAS_ARCHIVOS_VECTORIALES, "Cobertura forestal 2021.shp")
+
+
+# Archivo raster de capa de uso agropecuario y bosques
+ARCHIVO_RASTER_USO_AGROPECUARIO_BOSQUES <-
+  here("data", "processed", "uso-agrpecuario-bosques-2020.tif")
+
+
+# Resolución de las capas raster (en metros)
+RESOLUCION <- 30
+
+
+# Códigos de las clases de cobertura
+CODIGO_CULTIVOS <- 1
+CODIGO_PINA <- 2
+CODIGO_PALMA <- 3
+CODIGO_PASTOS <- 4
+CODIGO_CAFE <- 5
+CODIGO_BANANO <- 6
+CODIGO_CANA <- 7
+CODIGO_FORESTAL <- 8
+CODIGO_PNE <- 11
+CODIGO_RNH <- 12
+CODIGO_ASP <- 13
+
+
+# Etiquetas de las clases de cobertura
+ETIQUETA_CULTIVOS <- "Cultivos"
+ETIQUETA_PINA <- "Piña"
+ETIQUETA_PALMA <- "Palma"
+ETIQUETA_PASTOS <- "Pastos"
+ETIQUETA_CAFE <- "Café"
+ETIQUETA_BANANO <- "Banano"
+ETIQUETA_CANA <- "Caña"
+ETIQUETA_FORESTAL <- "Cobertura forestal"
+ETIQUETA_PNE <- "Patrimonio Natural del Estado"
+ETIQUETA_RNH <- "Registro Nacional de Humedales"
+ETIQUETA_ASP <- "Áreas Silvestres Protegidas"
+
+
+# Colores de las clases de cobertura
+COLOR_CULTIVOS <- "lightyellow"
+COLOR_PINA <- "orange" # rgb(255, 80, 0, maxColorValue = 255)
+COLOR_PALMA <- "red" # rgb(255, 161, 20, maxColorValue = 255)
+COLOR_PASTOS <- "green" # rgb(255, 255, 0, maxColorValue = 255)
+COLOR_CAFE <- "brown" # rgb(115, 38, 0, maxColorValue = 255)
+COLOR_BANANO <- "yellow" # rgb(240, 240, 0, maxColorValue = 255)
+COLOR_CANA <- "violet"
+COLOR_FORESTAL <- "darkgreen"
+COLOR_PNE <- "blue"
+COLOR_RNH <- "lightblue"
+COLOR_ASP <- "pink"
+```
+
+# Procesamiento
+
+```{r}
+#| label: combinacion-capas-raster
+#| code-fold: show
+#| code-summary: "Código para la combinación de capas raster"
+
+
+# COSTA RICA
+# Objeto sf de Costa Rica
+costarica_sf <-
+  st_read(ARCHIVO_VECTORIAL_COSTARICA, quiet = TRUE) |>
+  st_make_valid()
+
+# Recorte del objeto sf de Costa Rica
+costarica_sf <- 
+  costarica_sf |>
+  st_crop(st_bbox(
+    c(
+      xmin = 280000, 
+      ymin = 880000, 
+      xmax = 660000, 
+      ymax = 1250000
+    ), 
+    crs = st_crs(costarica_sf)
+  ))
+
+# Objeto raster de Costa Rica
+costarica_terra <-
+  rast(ext(vect(costarica_sf)), resolution = RESOLUCION)
+
+# Asignación de CRS
+crs(costarica_terra) <- "EPSG:5367"
+
+# Borrado de objetos innecesarios
+gc()
+
+
+# CULTIVOS
+# Objeto sf de cultivos
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_CULTIVOS, quiet = TRUE) |>
+  st_make_valid()
+  
+# Objeto raster de cultivos
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_CULTIVOS
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- capa_terra
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# PIÑA
+# Objeto sf de piña
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_PINA, quiet = TRUE) |>
+  st_make_valid()
+  
+# Objeto raster de piña
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_PINA
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# PALMA
+# Objeto sf de palma
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_PALMA, quiet = TRUE) |>
+  st_make_valid()
+  
+# Objeto raster de palma
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_PALMA
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# PASTOS
+# Objeto sf de pastos 2019
+pastos_2019_sf <-
+  st_read(ARCHIVO_VECTORIAL_PASTOS_2019, quiet = TRUE) |>
+  st_make_valid()
+
+# Objeto sf de pastos 2020
+pastos_2020_sf <-
+  st_read(ARCHIVO_VECTORIAL_PASTOS_2020, quiet = TRUE) |>
+  st_make_valid()
+
+# Objeto raster de pastos 2019
+pastos_2019_terra <-
+  rasterize(pastos_2019_sf, costarica_terra)
+
+# Asignación de CRS
+crs(pastos_2019_terra) <- "EPSG:5367"
+
+# Recorte
+pastos_2019_terra <-
+  pastos_2019_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Objeto raster de pastos 2020
+pastos_2020_terra <-
+  rasterize(pastos_2020_sf, costarica_terra)
+
+# Asignación de CRS
+crs(pastos_2020_terra) <- "EPSG:5367"
+
+# Recorte
+pastos_2020_terra <-
+  pastos_2020_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Unión
+capa_terra <- merge(pastos_2020_terra, pastos_2019_terra, overwrite=TRUE)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_PASTOS
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(pastos_2019_sf)
+rm(pastos_2020_sf)
+rm(pastos_2019_terra)
+rm(pastos_2020_terra)
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# CAFÉ
+# Objeto sf de café
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_CAFE, quiet = TRUE) |>
+  st_make_valid()
+
+# Objeto raster de café
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_CAFE
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# BANANO
+# Objeto sf de banano
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_BANANO, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de banano
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_BANANO
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# CAÑA
+# Objeto sf de caña
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_CANA_2020, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de banano
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_CANA
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# COBERTURA FORESTAL
+# Objeto sf de cobertura forestal
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_COBERTURA_FORESTAL, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de cobertura forestal
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_FORESTAL
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# PATRIMO NATURAL DEL ESTADO (PNE)
+# Objeto sf de PNE
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_PNE, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de PNE
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_PNE
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# REGISTRO NACIONAL DE HUMEDALES (RNH)
+# Objeto sf de RNH
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_RNH, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de RNH
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_RNH
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# ÁREAS SILVESTRES PROTEGIDAS (ASP)
+# Objeto sf de ASP
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_ASP, quiet = TRUE) |>
+  filter(cat_manejo == "Parque Nacional" | cat_manejo == "Reserva Biologica" | cat_manejo == "Monumento Natural") |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de ASP
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra[!is.na(capa_terra[])] <- CODIGO_ASP
+
+# Adición a la caoa de uso agropecuario y bosques
+agropecuario_bosques_terra <- merge(capa_terra, agropecuario_bosques_terra, overwrite=TRUE)
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+```
+
+
+# Almacenamiento de la capa de uso agropecuario y bosques
+
+```{r}
+#| label: almacenamiento-capa-uso-agropecuario-bosques
+#| code-fold: show
+#| code-summary: "Código para el almacenamiento de la capa de uso agropecuario y bosques"
+
+agropecuario_bosques_terra |>
+  writeRaster(
+    ARCHIVO_RASTER_USO_AGROPECUARIO_BOSQUES, 
+    overwrite=TRUE
+  )
+```
+
+
+# Mapa
+
+```{r}
+#| label: mapa-agropecuario-bosques
+#| eval: false
+#| message: false
+#| warning: false
+#| code-fold: true
+#| code-summary: "Código para el despliegue del mapa"
+
+
+# Colores de la paleta de la capa de uso agropecuario y bosques
+colores_agropecuario_bosques <- c(
+  COLOR_PINA,
+  COLOR_PALMA,
+  COLOR_PASTOS,
+  COLOR_CAFE,
+  COLOR_BANANO,
+  COLOR_CANA,
+  COLOR_FORESTAL,
+  COLOR_PNE,
+  COLOR_RNH,
+  COLOR_ASP
+)
+
+# Etiquetas para la leyenda de la paleta de colores 
+# de la capa de uso agropecuario y bosques
+etiquetas_agropecuario_bosques <- c(
+  ETIQUETA_PINA,
+  ETIQUETA_PALMA,
+  ETIQUETA_PASTOS,
+  ETIQUETA_CAFE,
+  ETIQUETA_BANANO,
+  ETIQUETA_CANA,
+  ETIQUETA_FORESTAL,
+  ETIQUETA_PNE,
+  ETIQUETA_RNH,
+  ETIQUETA_ASP
+)
+
+# Códigos para el dominio de la paleta de colores 
+# de la capa de uso agropecuario y bosques
+codigos_agropecuario_bosques <- c(
+  CODIGO_PINA,
+  CODIGO_PALMA,
+  CODIGO_PASTOS,
+  CODIGO_CAFE,
+  CODIGO_BANANO,
+  CODIGO_CANA,
+  CODIGO_FORESTAL,
+  CODIGO_PNE,
+  CODIGO_RNH,
+  CODIGO_ASP
+)
+
+# Paleta de colores de la capa de uso agropecuario y bosques
+paleta_agropecuario_bosques <- colorFactor(
+    palette = colores_agropecuario_bosques, 
+    domain = codigos_agropecuario_bosques,
+    na.color = "transparent"
+)
+
+
+leaflet() |>
+  setView(lng = -84.19452,
+          lat = 9.572735,
+          zoom = 7) |>
+  addProviderTiles(providers$CartoDB.PositronNoLabels, group = "Mapa básico (Carto)") |>
+  addTiles(group = "Mapa general (OSM)") |>
+  addProviderTiles(providers$Esri.WorldImagery,
+                   group = "Imágenes satelitales (ESRI)") |>
+  addRasterImage(
+    project(agropecuario_bosques_terra, "EPSG:4326"),
+    colors = paleta_agropecuario_bosques,
+    opacity = 0.6,
+    group = "Uso agropecuario y bosques",
+  ) |>
+    addLegend(
+    title = "Uso agropecuario y bosques",
+    position = "bottomleft",
+    colors = colores_agropecuario_bosques,
+    labels = etiquetas_agropecuario_bosques,
+    group = "Uso agropecuario y bosques"
+  ) |>  
+  # addPolygons(
+  #   data = st_transform(pina_sf, 4326, quiet = TRUE),
+  #   color = COLOR_PINA,
+  #   fillColor = "transparent",
+  #   stroke = TRUE,
+  #   weight = 2.0,
+  #   popup = paste(
+  #     paste0("<strong>Clase: </strong>", pina_sf$clase),
+  #     paste0("<strong>Id: </strong>", pina_sf$id),
+  #     paste0("<strong>Región: </strong>", pina_sf$region),
+  #     paste0("<strong>Año: </strong>", pina_sf$año),
+  #     paste0("<strong>Área (ha): </strong>", pina_sf$area_ha),
+  #     sep = '<br/>'
+  #   ),
+  #   group = "Piña (vectorial)"
+  # ) |>
+  addPolygons(
+    data = st_transform(asp_sf, 4326),
+    color = "darkgreen",
+    fillColor = "transparent",
+    stroke = TRUE,
+    weight = 2.0,
+    popup = paste(
+      paste0("<strong>Nombre del ASP: </strong>", asp_sf$nombre_asp),
+      paste0("<strong>Categoría de manejo: </strong>", asp_sf$cat_manejo),
+      sep = '<br/>'
+    ),    
+    group = "ASP (PN, RB y MN)"
+  ) |>
+  addPolygons(
+    data = st_transform(pne_sf, 4326),
+    color = "black",
+    fillColor = "transparent",
+    stroke = TRUE,
+    weight = 2.0,
+    popup = paste(
+      paste0("<strong>Categoría de PNE: </strong>", pne_sf$categoria),
+      paste0("<strong>ASP: </strong>", pne_sf$nombre_asp),
+      paste0("<strong>Número de finca: </strong>", pne_sf$n_finca),
+      sep = '<br/>'
+    ),    
+    group = "Patrimonio natural del estado"
+  ) |>
+  addPolygons(
+    data = st_transform(rnh_sf, 4326),
+    color = "blue",
+    fillColor = "transparent",
+    stroke = TRUE,
+    weight = 2.0,
+    popup = paste(
+      paste0("<strong>Tipo de humedal: </strong>", rnh_sf$tipo_hum),
+      paste0("<strong>Clase: </strong>", rnh_sf$clase_hum),
+      paste0("<strong>Nombre: </strong>", pne_sf$n_finca),
+      sep = '<br/>'
+    ),    
+    group = "Registro nacional de humedales"
+  ) |>  
+  addLayersControl(
+    baseGroups = c(
+      "Mapa básico (Carto)",
+      "Mapa general (OSM)",
+      "Imágenes satelitales (ESRI)"
+    ),
+    overlayGroups = c(
+      #"Piña (vectorial)",
+      #"Palma (vectorial)",
+      "Uso agropecuario y bosques",
+      "ASP (PN, RB y MN)",
+      "Patrimonio natural del estado",
+      "Registro nacional de humedales"
+    ),
+    options = layersControlOptions(collapsed = FALSE)
+  ) |>
+  addResetMapButton() |>
+  addSearchOSM() |>
+  addMouseCoordinates() |>
+  addScaleBar(position = "bottomleft",
+              options = scaleBarOptions(imperial = FALSE)) |>
+  addMiniMap(position = "bottomright") |>
+  addFullscreenControl()
+```
+
