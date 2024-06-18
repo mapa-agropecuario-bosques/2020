@@ -2,15 +2,8 @@
 
 ## Flujos de trabajo
 
-### Entradas
-- [Lista de capas WFS](https://github.com/mapa-agropecuario-bosques/2020/blob/main/data/raw/capas-wfs.csv)
-
-### Procesamiento
-- [Descarga de capas WFS](https://mapa-agropecuario-bosques.github.io/2020/src/data/descarga-capas-wfs.html)  
-- [Combinación de capas](https://mapa-agropecuario-bosques.github.io/2020/src/data/combinacion-capas.html)  
-
 ### Salidas
-- [Capas WFS descargadas](https://drive.google.com/drive/folders/1M2NEtAsnteFmjm5tK1vr5l1V01dtgXCo?usp=sharing)
+- [Capa de uso agropecuario y bosques (preliminar)](https://github.com/mapa-agropecuario-bosques/2020/blob/main/salidas/)
 
 ## Manejo del contenedor Docker
 
