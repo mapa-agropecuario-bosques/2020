@@ -29,22 +29,54 @@ ARCHIVO_VECTORIAL_COSTARICA <-
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "costarica.gpkg")
 
 # Archivo raster de cobertura y uso de la tierra del proyecto REDD original
-ARCHIVO_RASTER_REDD_ORIGINAL <- 
-  here(DIRECTORIO_CAPAS_RASTER_ORIGINALES, "MC21_20_01_23_GDAL.tif")
+ARCHIVO_RASTER_REDD_COSTARICA_ORIGINAL <- 
+  here(DIRECTORIO_CAPAS_RASTER_ORIGINALES, "MC21_RECLASIFICADO_IPCC_9_7_2024.tif")
 
 # Archivo raster de cobertura y uso de la tierra del proyecto REDD remuestreado
-ARCHIVO_RASTER_REDD_REMUESTREADO <- 
-  here(DIRECTORIO_CAPAS_REMUESTREADAS, "MC21_20_01_23_GDAL_REMUESTREADO.tif")
+ARCHIVO_RASTER_REDD_COSTARICA_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "MC21_RECLASIFICADO_IPCC_9_7_2024_REMUESTREADO.tif")
 
-# Archivo raster de zonas urbanas remuestreado
-ARCHIVO_RASTER_ZONASURBANAS_REMUESTREADO <- 
-  here(DIRECTORIO_CAPAS_REMUESTREADAS, "zonas-urbanas-2021.tif")
+# Archivos raster de capas REDD remuestreados
+ARCHIVO_RASTER_REDD_BOSQUES_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-bosques-2021.tif")
+ARCHIVO_RASTER_REDD_CULTIVOSANUALES_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-cultivosanuales-2021.tif")
+ARCHIVO_RASTER_REDD_CULTIVOSPERMANENTES_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-cultivospermanentes-2021.tif")
+ARCHIVO_RASTER_REDD_PASTOS_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-pastos-2021.tif")
+ARCHIVO_RASTER_REDD_AREASURBANAS_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-areasurbanas-2021.tif")
+ARCHIVO_RASTER_REDD_CUERPOSAGUA_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-cuerposagua-2021.tif")
+ARCHIVO_RASTER_REDD_PARAMOS_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-paramos-2021.tif")
+ARCHIVO_RASTER_REDD_SUELOSDESNUDOS_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-suelosdesnudos-2021.tif")
+ARCHIVO_RASTER_REDD_SININFORMACION_REMUESTREADO <- 
+  here(DIRECTORIO_CAPAS_REMUESTREADAS, "redd-sininformacion-2021.tif")
 
-# Valor actual de las zonas urbanas
-VALOR_ZONAS_URBANAS_ACTUAL <- 95
+# Valores actuales de capas REDD
+VALOR_REDD_BOSQUES_ACTUAL <- 1
+VALOR_REDD_CULTIVOSANUALES_ACTUAL <- 2
+VALOR_REDD_CULTIVOSPERMANENTES_ACTUAL <- 3
+VALOR_REDD_PASTOS_ACTUAL <- 4
+VALOR_REDD_AREASURBANAS_ACTUAL <- 5
+VALOR_REDD_CUERPOSAGUA_ACTUAL <- 6
+VALOR_REDD_PARAMOS_ACTUAL <- 7
+VALOR_REDD_SUELOSDESNUDOS_ACTUAL <- 8
+VALOR_REDD_SININFORMACION_ACTUAL <- 101
 
-# Valor nuevo de las zonas urbanas
-VALOR_ZONAS_URBANAS_NUEVO <- 1
+# Valores nuevos de capas REDD
+VALOR_REDD_BOSQUES_NUEVO <- 51
+VALOR_REDD_CULTIVOSANUALES_NUEVO <- 52
+VALOR_REDD_CULTIVOSPERMANENTES_NUEVO <- 53
+VALOR_REDD_PASTOS_NUEVO <- 54
+VALOR_REDD_AREASURBANAS_NUEVO <- 55
+VALOR_REDD_CUERPOSAGUA_NUEVO <- 56
+VALOR_REDD_PARAMOS_NUEVO <- 57
+VALOR_REDD_SUELOSDESNUDOS_NUEVO <- 58
+VALOR_REDD_SININFORMACION_NUEVO <- 59
 
 # Resolución de las capas raster (en metros)
 RESOLUCION <- 10
@@ -54,7 +86,7 @@ RESOLUCION <- 10
 
 # COSTA RICA
 
-cat("Remuestreando polígono del contorno de Costa Rica...\n")
+cat("Rasterizando polígono del contorno de Costa Rica ...\n")
 
 # Objeto sf de Costa Rica
 costarica_sf <-
@@ -83,49 +115,195 @@ crs(costarica_terra) <- "EPSG:5367"
 
 cat("Finalizado\n\n")
 
-# Borrado de objetos innecesarios
-gc()
 
+# Objeto terra de REDD Costa Rica original
 
-# Objeto terra de REDD original
+cat("Remuestreando datos de REDD Costa Rica ...\n")
 
-cat("Remuestreando datos de REDD...\n")
+capa_redd_costarica_original <-
+  rast(ARCHIVO_RASTER_REDD_COSTARICA_ORIGINAL)
 
-capa_terra_original <-
-  rast(ARCHIVO_RASTER_REDD_ORIGINAL)
-
-# Objeto terra de REDD remuestreado
-capa_terra_remuestreada <-
-  capa_terra_original |>
+# Objeto terra de REDD Costa Rica remuestreado
+capa_redd_costarica_remuestreada <-
+  capa_redd_costarica_original |>
   resample(costarica_terra, method = "near")
 
 # Recorte
-capa_terra_remuestreada <-
-  capa_terra_remuestreada |>
+capa_redd_costarica_remuestreada <-
+  capa_redd_costarica_remuestreada |>
   crop(costarica_sf) |>
   mask(costarica_sf)
 
 # Escritura
-# writeRaster(
-#   capa_terra_remuestreada,
-#   ARCHIVO_RASTER_REDD_REMUESTREADO,
-#   overwrite=TRUE
-# )
-
-cat("Finalizado\n\n")
-
-cat("Extrayendo datos de zonas urbanas...\n")
-
-# Capa raster de zonas urbanas
-capa_zonasurbanas_remuestreada <-
-  ifel(capa_terra_remuestreada == VALOR_ZONAS_URBANAS_ACTUAL, VALOR_ZONAS_URBANAS_NUEVO, NA)
-
 writeRaster(
-  capa_zonasurbanas_remuestreada,
-  ARCHIVO_RASTER_ZONASURBANAS_REMUESTREADO,
+  capa_redd_costarica_remuestreada,
+  ARCHIVO_RASTER_REDD_COSTARICA_REMUESTREADO,
   overwrite=TRUE
 )
 
 cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Bosques ...\n")
+
+# Capa raster de REDD Bosques
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_BOSQUES_ACTUAL, 
+  VALOR_REDD_BOSQUES_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_BOSQUES_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Cultivos Anuales ...\n")
+
+# Capa raster de REDD Cultivos Anuales
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_CULTIVOSANUALES_ACTUAL, 
+  VALOR_REDD_CULTIVOSANUALES_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_CULTIVOSANUALES_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Cultivos Permanentes ...\n")
+
+# Capa raster de REDD Cultivos Permanentes
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_CULTIVOSPERMANENTES_ACTUAL, 
+  VALOR_REDD_CULTIVOSPERMANENTES_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_CULTIVOSPERMANENTES_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Pastos ...\n")
+
+# Capa raster de REDD Pastos
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_PASTOS_ACTUAL, 
+  VALOR_REDD_PASTOS_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_PASTOS_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Áreas Urbanas ...\n")
+
+# Capa raster de REDD Áreas Urbanas
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_AREASURBANAS_ACTUAL, 
+  VALOR_REDD_AREASURBANAS_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_AREASURBANAS_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Cuerpos de Agua ...\n")
+
+# Capa raster de REDD Cuerpos de Agua
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_CUERPOSAGUA_ACTUAL, 
+  VALOR_REDD_CUERPOSAGUA_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_CUERPOSAGUA_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Páramos ...\n")
+
+# Capa raster de REDD Páramos
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_PARAMOS_ACTUAL, 
+  VALOR_REDD_PARAMOS_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_PARAMOS_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Suelos Desnudos ...\n")
+
+# Capa raster de REDD Suelos Desnudos
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_SUELOSDESNUDOS_ACTUAL, 
+  VALOR_REDD_SUELOSDESNUDOS_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_SUELOSDESNUDOS_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+
+cat("Extrayendo datos de REDD Sin Información ...\n")
+
+# Capa raster de REDD Sin Información
+capa_terra_remuestreada <- ifel(
+  capa_redd_costarica_remuestreada == VALOR_REDD_SININFORMACION_ACTUAL, 
+  VALOR_REDD_SININFORMACION_NUEVO, 
+  NA
+)
+
+writeRaster(
+  capa_terra_remuestreada,
+  ARCHIVO_RASTER_REDD_SININFORMACION_REMUESTREADO,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
 
 cat("FIN\n")
