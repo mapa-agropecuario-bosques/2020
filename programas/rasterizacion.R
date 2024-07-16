@@ -1,3 +1,14 @@
+#
+# RASTERIZACIÓN DE CAPAS VECTORIALES
+#
+
+# NOTA:
+# Este programa requiere de una cantidad considerable de RAM. Antes de 
+# ejecutarlo, se recomienda
+# - Cerrar programas que no se estén utilizando (ej. QGIS).
+# - Reiniciar el contenedor Docker.
+
+
 # Paquetes
 library(here)
 library(dplyr)
@@ -81,7 +92,7 @@ ARCHIVO_VECTORIAL_BANANO <-
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "fincas_Bananeras.shp")
 # Archivo raster de banano
 ARCHIVO_RASTER_BANANO <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "fincas_Bananeras.tif")
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "cultivo-banano.tif")
 
 # Archivo vectorial de caña 2020
 ARCHIVO_VECTORIAL_CANA_2020 <- 
@@ -95,7 +106,7 @@ ARCHIVO_VECTORIAL_COBERTURA_FORESTAL <-
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "Cobertura forestal 2021.shp")
 # Archivo raster de cobertura forestal
 ARCHIVO_RASTER_COBERTURA_FORESTAL <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "Cobertura forestal 2021.tif")
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "cobertura-forestal-2021.tif")
 
 
 # Resolución de las capas raster (en metros)
@@ -103,50 +114,22 @@ RESOLUCION <- 10
 
 
 # Códigos de las clases de cobertura
-CODIGO_CULTIVOS <- 2
-CODIGO_PINA <- 3
-CODIGO_PALMA <- 4
-CODIGO_PASTOS <- 5
-CODIGO_CAFE <- 6
-CODIGO_BANANO <- 7
-CODIGO_CANA <- 8
-CODIGO_FORESTAL <- 9
-CODIGO_PNE <- 10
-CODIGO_RNH <- 11
-CODIGO_ASP <- 12
-
-
-# Etiquetas de las clases de cobertura
-ETIQUETA_CULTIVOS <- "Cultivos"
-ETIQUETA_PINA <- "Piña"
-ETIQUETA_PALMA <- "Palma"
-ETIQUETA_PASTOS <- "Pastos"
-ETIQUETA_CAFE <- "Café"
-ETIQUETA_BANANO <- "Banano"
-ETIQUETA_CANA <- "Caña"
-ETIQUETA_FORESTAL <- "Cobertura forestal"
-ETIQUETA_PNE <- "Patrimonio Natural del Estado"
-ETIQUETA_RNH <- "Registro Nacional de Humedales"
-ETIQUETA_ASP <- "Áreas Silvestres Protegidas"
-
-
-# Colores de las clases de cobertura
-COLOR_CULTIVOS <- "lightyellow"
-COLOR_PINA <- "orange" # rgb(255, 80, 0, maxColorValue = 255)
-COLOR_PALMA <- "red" # rgb(255, 161, 20, maxColorValue = 255)
-COLOR_PASTOS <- "green" # rgb(255, 255, 0, maxColorValue = 255)
-COLOR_CAFE <- "brown" # rgb(115, 38, 0, maxColorValue = 255)
-COLOR_BANANO <- "yellow" # rgb(240, 240, 0, maxColorValue = 255)
-COLOR_CANA <- "violet"
-COLOR_FORESTAL <- "darkgreen"
-COLOR_PNE <- "blue"
-COLOR_RNH <- "lightblue"
-COLOR_ASP <- "lightgreen"
+CODIGO_CULTIVOS <- 1
+CODIGO_PINA <- 2
+CODIGO_PALMA <- 3
+CODIGO_PASTOS <- 4
+CODIGO_CAFE <- 5
+CODIGO_BANANO <- 6
+CODIGO_CANA <- 7
+CODIGO_FORESTAL <- 8
+CODIGO_PNE <- 9
+CODIGO_RNH <- 10
+CODIGO_ASP <- 11
 
 
 # COSTA RICA
 
-print("Rasterizando polígono del contorno de Costa Rica...")
+cat("Rasterizando polígono del contorno de Costa Rica ...\n")
 
 # Objeto sf de Costa Rica
 costarica_sf <-
@@ -174,7 +157,7 @@ costarica_terra <-
 # Asignación de CRS
 crs(costarica_terra) <- "EPSG:5367"
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 gc()
@@ -182,7 +165,7 @@ gc()
 
 # CULTIVOS
 
-print("Rasterizando datos de cultivos...")
+cat("Rasterizando datos de cultivos ...\n")
 
 # Objeto sf de cultivos
 capa_sf <-
@@ -211,7 +194,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -221,7 +204,7 @@ gc()
 
 # PIÑA
 
-print("Rasterizando datos de piña...")
+cat("Rasterizando datos de piña ...\n")
 
 # Objeto sf de piña
 capa_sf <-
@@ -250,7 +233,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -260,7 +243,7 @@ gc()
 
 # PALMA
 
-print("Rasterizando datos de palma...")
+cat("Rasterizando datos de palma ...\n")
 
 # Objeto sf de palma
 capa_sf <-
@@ -289,7 +272,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -299,7 +282,7 @@ gc()
 
 # PASTOS
 
-print("Rasterizando datos de pastos...")
+cat("Rasterizando datos de pastos ...\n")
 
 # Objeto sf de pastos 2019
 pastos_2019_sf <-
@@ -349,7 +332,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(pastos_2019_sf)
@@ -363,7 +346,7 @@ gc()
 
 # CAFÉ
 
-print("Rasterizando datos de café...")
+cat("Rasterizando datos de café ...\n")
 
 # Objeto sf de café
 capa_sf <-
@@ -392,7 +375,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -402,7 +385,7 @@ gc()
 
 # BANANO
 
-print("Rasterizando datos de banano...")
+cat("Rasterizando datos de banano ...\n")
 
 # Objeto sf de banano
 capa_sf <-
@@ -432,7 +415,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -442,7 +425,7 @@ gc()
 
 # CAÑA
 
-print("Rasterizando datos de caña...")
+cat("Rasterizando datos de caña ...\n")
 
 # Objeto sf de caña
 capa_sf <-
@@ -472,7 +455,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -482,7 +465,7 @@ gc()
 
 # COBERTURA FORESTAL
 
-print("Rasterizando datos de cobertura forestal...")
+cat("Rasterizando datos de cobertura forestal ...\n")
 
 # Objeto sf de cobertura forestal
 capa_sf <-
@@ -512,7 +495,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -522,7 +505,7 @@ gc()
 
 # PATRIMO NATURAL DEL ESTADO (PNE)
 
-print("Rasterizando datos de PNE...")
+cat("Rasterizando datos del Patrimonio Natural del Estado (PNE) ...\n")
 
 # Objeto sf de PNE
 capa_sf <-
@@ -552,7 +535,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -562,7 +545,7 @@ gc()
 
 # REGISTRO NACIONAL DE HUMEDALES (RNH)
 
-print("Rasterizando datos de RNH...")
+cat("Rasterizando datos del Registro Nacional de Humedales (RNH) ...\n")
 
 # Objeto sf de RNH
 capa_sf <-
@@ -592,7 +575,7 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
 # Borrado de objetos innecesarios
 rm(capa_sf)
@@ -602,7 +585,7 @@ gc()
 
 # ÁREAS SILVESTRES PROTEGIDAS (ASP)
 
-print("Rasterizando datos de ASP...")
+cat("Rasterizando datos de Áreas Silvestres Protegidas (ASP) ...\n")
 
 # Objeto sf de ASP
 capa_sf <-
@@ -634,6 +617,6 @@ capa_terra |> writeRaster(
   overwrite=TRUE
 )
 
-print("Finalizado\n")
+cat("Finalizado\n\n")
 
-print("FIN")
+cat("FIN\n")
