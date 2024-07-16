@@ -42,18 +42,26 @@
         <stdDevFactor>2</stdDevFactor>
       </minMaxOrigin>
 			<colorPalette>
-				<paletteEntry alpha="255" color="#e6004d" value="1" label="Zonas urbanas"/>
-				<paletteEntry alpha="255" color="#ffff99" value="2" label="Cultivos"/>
-				<paletteEntry alpha="255" color="#ffcc66" value="3" label="Piña"/>
-				<paletteEntry alpha="255" color="#ff9933" value="4" label="Palma"/>
-				<paletteEntry alpha="255" color="#99cc66" value="5" label="Pastos"/>
-				<paletteEntry alpha="255" color="#cc9933" value="6" label="Café"/>
-				<paletteEntry alpha="255" color="#ffff00" value="7" label="Banano"/>
-				<paletteEntry alpha="255" color="#ffccff" value="8" label="Caña"/>
-				<paletteEntry alpha="255" color="#006600" value="9" label="Cobertura forestal"/>
-				<paletteEntry alpha="255" color="#3399ff" value="10" label="Patrimonio Natural del Estado"/>
-				<paletteEntry alpha="255" color="#66ccff" value="11" label="Registro Nacional de Humedales"/>
-				<paletteEntry alpha="255" color="#66cc99" value="12" label="Áreas Silvestres Protegidas"/>
+				<paletteEntry alpha="255" color="#55ac26" value="51" label="REDD Bosques"/>
+				<paletteEntry alpha="255" color="#ebafd8" value="52" label="REDD Cultivos anuales"/>
+				<paletteEntry alpha="255" color="#f37b1f" value="53" label="REDD Cultivos permanentes"/>
+				<paletteEntry alpha="255" color="#fbef0c" value="54" label="REDD Pastos"/>
+				<paletteEntry alpha="255" color="#aab1b1" value="55" label="REDD Áreas urbanas"/>
+				<paletteEntry alpha="255" color="#1b85e2" value="56" label="REDD Cuerpos de agua"/>
+				<paletteEntry alpha="255" color="#7c2a62" value="57" label="REDD Páramos"/>
+				<paletteEntry alpha="255" color="#db3220" value="58" label="REDD Suelos desnudos"/>
+				<paletteEntry alpha="255" color="#2a291f" value="59" label="REDD Sin información"/>
+				<paletteEntry alpha="255" color="#ffff99" value="1"  label="Cultivos"/>
+				<paletteEntry alpha="255" color="#ffcc66" value="2"  label="Piña"/>
+				<paletteEntry alpha="255" color="#ff9933" value="3"  label="Palma"/>
+				<paletteEntry alpha="255" color="#99cc66" value="4"  label="Pastos"/>
+				<paletteEntry alpha="255" color="#cc9933" value="5"  label="Café"/>
+				<paletteEntry alpha="255" color="#ffff00" value="6"  label="Banano"/>
+				<paletteEntry alpha="255" color="#ffccff" value="7"  label="Caña"/>
+				<paletteEntry alpha="255" color="#006600" value="8"  label="Cobertura forestal"/>
+				<paletteEntry alpha="255" color="#3399ff" value="9"  label="Patrimonio Natural del Estado"/>
+				<paletteEntry alpha="255" color="#66ccff" value="10" label="Registro Nacional de Humedales"/>
+				<paletteEntry alpha="255" color="#66cc99" value="11" label="Áreas Silvestres Protegidas"/>
 			</colorPalette>
       <colorramp type="randomcolors" name="[source]">
         <Option/>
