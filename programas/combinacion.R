@@ -1,5 +1,5 @@
 #
-# UNIÓN DE CAPAS RASTER
+# COMBINACIÓN DE CAPAS RASTER
 #
 
 # Paquetes
