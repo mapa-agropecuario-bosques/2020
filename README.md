@@ -1,9 +1,44 @@
 # Desarrollo de un mapa base de uso agropecuario y bosques a nivel nacional del año 2020
+Este repositorio contiene el código fuente en lenguaje R y la documentación para generar un mapa base de uso agropecuario y bosques de Costa Rica correspondiente al año 2020. El mapa se crea a partir de la combinación de capas vectoriales y raster de cobertura forestal, cultivos, áreas silvestres protegidas y otras.
 
-## Flujos de trabajo
+## Flujo de trabajo
 
-### Salidas
-- [Capa de uso agropecuario y bosques (preliminar)](https://github.com/mapa-agropecuario-bosques/2020/blob/main/salidas/)
+1. Remuestreo de capas raster: `programas/remuestreo.R`
+    - Entradas
+        - Directorio de capas raster originales: `datos/originales/raster`
+    - Salidas
+        - Directorio de capas remuestreadas: `datos/procesados/remuestreados`
+        
+2. Rasterización de capas vectoriales: `programas/rasterizacion.R`
+    - Entradas
+        - Directorio de capas vectoriales originales: `datos/originales/vectoriales`
+    - Salidas
+        - Directorio de capas rasterizadas: `datos/procesados/rasterizados`
+        
+3. Combinación de capas remuestreadas y rasterizadas: `programas/combinacion.R`
+    - Entradas
+        - Directorio de capas rasterizadas: `datos/procesados/rasterizados`
+        - Directorio de capas remuestreadas: `datos/procesados/remuestreados`
+    - Salidas
+        - Archivo raster de capa de uso agropecuario y bosques: `salidas/uso-agropecuario-bosques-2020.tif`
+        
+4. Reclasificación de la capa combinada: `programas/reclasificacion.R`
+    - Entradas
+        - Archivo raster de capa de uso agropecuario y bosques: `salidas/uso-agropecuario-bosques-2020.tif`
+    - Salidas
+        - Archivo raster de capa de uso agropecuario y bosques reclasificado: `salidas/uso-agropecuario-bosques-reclasificado.tif`
+        
+5. Compresión de la capa reclasificada: `programas/compresion-salidas.sh`
+    - Entradas
+        - Archivo raster de capa de uso agropecuario y bosques reclasificado: `salidas/uso-agropecuario-bosques-reclasificado.tif`
+    - Salidas
+        - Archivo raster de capa de uso agropecuario y bosques reclasificado comprimido: `salidas/uso-agropecuario-bosques-2020-reclasificado-comprimido.tif`
+        
+6. Generación de estadísticas: `programas/generacion-estadisticas.R`
+    - Entradas
+        - Archivo raster de capa de uso agropecuario y bosques reclasificado comprimido: `salidas/uso-agropecuario-bosques-2020-reclasificado-comprimido.tif`
+    - Salidas
+        - Archivo CSV con estadísticas: `salidas/estadisticas.csv`
 
 ## Manejo del contenedor Docker
 

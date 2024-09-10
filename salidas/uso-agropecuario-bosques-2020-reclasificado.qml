@@ -42,20 +42,22 @@
         <stdDevFactor>2</stdDevFactor>
       </minMaxOrigin>
 			<colorPalette>
-				<paletteEntry alpha="255" color="#ffff99" value="1"  label="Cultivos"/>
-				<paletteEntry alpha="255" color="#ffcc66" value="2"  label="Piña"/>
-				<paletteEntry alpha="255" color="#ff9933" value="3"  label="Palma"/>
-				<paletteEntry alpha="255" color="#99cc66" value="4"  label="Pastos"/>
-				<paletteEntry alpha="255" color="#cc9933" value="5"  label="Café"/>
-				<paletteEntry alpha="255" color="#ffff00" value="6"  label="Banano"/>
-				<paletteEntry alpha="255" color="#ffccff" value="7"  label="Caña"/>
-				<paletteEntry alpha="255" color="#006600" value="8"  label="Cobertura forestal"/>
-				<paletteEntry alpha="255" color="#3399ff" value="9"  label="Patrimonio Natural del Estado"/>
-				<paletteEntry alpha="255" color="#66ccff" value="10" label="Registro Nacional de Humedales"/>
-				<paletteEntry alpha="255" color="#66cc99" value="11" label="Áreas Silvestres Protegidas"/>
-				<paletteEntry alpha="255" color="#aab1b1" value="55" label="REDD Áreas urbanas"/>
-				<paletteEntry alpha="255" color="#db3220" value="58" label="REDD Suelos desnudos"/>
-				<paletteEntry alpha="255" color="#2a291f" value="59" label="REDD Sin información"/>				
+				<paletteEntry alpha="255" color="#f80000" value="1"  label="Red vial"/>
+				<paletteEntry alpha="255" color="#afffaf" value="2"  label="Áreas Silvestres Protegidas"/>
+				<paletteEntry alpha="255" color="#b4e6fa" value="3"  label="Humedales"/>
+				<paletteEntry alpha="255" color="#cdcd64" value="4"  label="Patrimonio Natural del Estado"/>
+				<paletteEntry alpha="255" color="#ffaa00" value="5"  label="Caña"/>
+				<paletteEntry alpha="255" color="#f0f000" value="6"  label="Banano"/>
+				<paletteEntry alpha="255" color="#732600" value="7"  label="Café"/>
+				<paletteEntry alpha="255" color="#ffffa6" value="8"  label="Pasto"/>
+				<paletteEntry alpha="255" color="#ffa114" value="9"  label="Palma"/>
+				<paletteEntry alpha="255" color="#ff5000" value="10" label="Piña"/>
+				<paletteEntry alpha="255" color="#becd00" value="11" label="Cultivos"/>
+				<paletteEntry alpha="255" color="#64ff96" value="12" label="Páramo"/>
+				<paletteEntry alpha="255" color="#266900" value="13" label="Cobertura forestal"/>
+				<paletteEntry alpha="255" color="#dcdcdc" value="14" label="Suelo desnudo"/>
+				<paletteEntry alpha="255" color="#f6d9df" value="15" label="Zonas urbanas"/>												
+				<paletteEntry alpha="255" color="#ffffff" value="16" label="Sin información"/>								
 			</colorPalette>
       <colorramp type="randomcolors" name="[source]">
         <Option/>

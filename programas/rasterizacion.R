@@ -9,11 +9,28 @@
 # - Reiniciar el contenedor Docker.
 
 
-# Paquetes
+# PAQUETES
 library(here)
 library(dplyr)
 library(sf)
 library(terra)
+
+
+# PARÁMETROS GENERALES
+
+# Códigos de las clases de cobertura
+CODIGO_FORESTAL <- 212
+CODIGO_CULTIVOS <- 211
+CODIGO_PINA <- 210
+CODIGO_PALMA <- 209
+CODIGO_PASTOS <- 208
+CODIGO_CAFE <- 207
+CODIGO_BANANO <- 206
+CODIGO_CANA <- 205
+CODIGO_PNE <- 204
+CODIGO_RNH <- 203
+CODIGO_ASP <- 202
+CODIGO_RVN <- 201
 
 
 # Directorio de capas vectoriales
@@ -24,30 +41,17 @@ DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES <-
 DIRECTORIO_CAPAS_RASTERIZADAS <- 
   here("datos", "procesados", "rasterizados")
 
+
 # Archivo vectorial de Costa Rica
 ARCHIVO_VECTORIAL_COSTARICA <- 
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "costarica.gpkg")
 
-# Archivo vectorial de áreas silvestres protegidas (ASP)
-ARCHIVO_VECTORIAL_ASP <- 
-  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "areas-silvestres-protegidas.gpkg")
-# Archivo raster de áreas silvestres protegidas (ASP)
-ARCHIVO_RASTER_ASP <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "areas-silvestres-protegidas.tif")
-
-# Archivo vectorial de patrimonio natural del estado (PNE)
-ARCHIVO_VECTORIAL_PNE <- 
-  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "patrimonio-natural-estado.gpkg")
-# Archivo raster de patrimonio natural del estado (PNE)
-ARCHIVO_RASTER_PNE <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "patrimonio-natural-estado.tif")
-
-# Archivo vectorial de registro nacional de humedales (RNH)
-ARCHIVO_VECTORIAL_RNH <- 
-  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "registro-nacional-humedales.gpkg")
-# Archivo raster de registro nacional de humedales (RNH)
-ARCHIVO_RASTER_RNH <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "registro-nacional-humedales.tif")
+# Archivo vectorial de cobertura forestal
+ARCHIVO_VECTORIAL_COBERTURA_FORESTAL <- 
+  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "Cobertura forestal 2021.shp")
+# Archivo raster de cobertura forestal
+ARCHIVO_RASTER_COBERTURA_FORESTAL <- 
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "cobertura-forestal-2021.tif")
 
 # Archivo vectorial de cultivos
 ARCHIVO_VECTORIAL_CULTIVOS <- 
@@ -80,10 +84,10 @@ ARCHIVO_VECTORIAL_PASTOS_2020 <-
 ARCHIVO_RASTER_PASTOS <- 
   here(DIRECTORIO_CAPAS_RASTERIZADAS, "cultivo-pastos-2019-2020.tif")
 
-# Archivo vectorial de café 2017-2018
+# Archivo vectorial de café
 ARCHIVO_VECTORIAL_CAFE <- 
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "cultivo-cafe-2017-2018.gpkg")
-# Archivo raster de café 2017-2018
+# Archivo raster de café
 ARCHIVO_RASTER_CAFE <- 
   here(DIRECTORIO_CAPAS_RASTERIZADAS, "cultivo-cafe-2017-2018.tif")
 
@@ -94,42 +98,51 @@ ARCHIVO_VECTORIAL_BANANO <-
 ARCHIVO_RASTER_BANANO <- 
   here(DIRECTORIO_CAPAS_RASTERIZADAS, "cultivo-banano.tif")
 
-# Archivo vectorial de caña 2020
+# Archivo vectorial de caña
 ARCHIVO_VECTORIAL_CANA_2020 <- 
   here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "cultivo-cana-2020.gpkg")
-# Archivo raster de caña 2020
+# Archivo raster de caña
 ARCHIVO_RASTER_CANA_2020 <- 
   here(DIRECTORIO_CAPAS_RASTERIZADAS, "cultivo-cana-2020.tif")
 
-# Archivo vectorial de cobertura forestal
-ARCHIVO_VECTORIAL_COBERTURA_FORESTAL <- 
-  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "Cobertura forestal 2021.shp")
-# Archivo raster de cobertura forestal
-ARCHIVO_RASTER_COBERTURA_FORESTAL <- 
-  here(DIRECTORIO_CAPAS_RASTERIZADAS, "cobertura-forestal-2021.tif")
+# Archivo vectorial de Patrimonio Natural del Estado (PNE)
+ARCHIVO_VECTORIAL_PNE <- 
+  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "patrimonio-natural-estado.gpkg")
+# Archivo raster de Patrimonio Natural del Estado (PNE)
+ARCHIVO_RASTER_PNE <- 
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "patrimonio-natural-estado.tif")
+
+# Archivo vectorial de Registro Nacional de Humedales (RNH)
+ARCHIVO_VECTORIAL_RNH <- 
+  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "registro-nacional-humedales.gpkg")
+# Archivo raster de Registro Nacional de Humedales (RNH)
+ARCHIVO_RASTER_RNH <- 
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "registro-nacional-humedales.tif")
+
+# Archivo vectorial de Áreas Silvestres Protegidas (ASP)
+ARCHIVO_VECTORIAL_ASP <- 
+  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "areas-silvestres-protegidas.gpkg")
+# Archivo raster de Áreas Silvestres Protegidas (ASP)
+ARCHIVO_RASTER_ASP <- 
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "areas-silvestres-protegidas.tif")
+
+# Archivo vectorial de Red Vial Nacional (RVN)
+ARCHIVO_VECTORIAL_RVN <- 
+  here(DIRECTORIO_CAPAS_VECTORIALES_ORIGINALES, "Red_Vial_Nacional.shp")
+# Archivo raster de Red Vial Nacional (RVN)
+ARCHIVO_RASTER_RVN <- 
+  here(DIRECTORIO_CAPAS_RASTERIZADAS, "red-vial-nacional.tif")
 
 
 # Resolución de las capas raster (en metros)
 RESOLUCION <- 10
 
 
-# Códigos de las clases de cobertura
-CODIGO_CULTIVOS <- 1
-CODIGO_PINA <- 2
-CODIGO_PALMA <- 3
-CODIGO_PASTOS <- 4
-CODIGO_CAFE <- 5
-CODIGO_BANANO <- 6
-CODIGO_CANA <- 7
-CODIGO_FORESTAL <- 8
-CODIGO_PNE <- 9
-CODIGO_RNH <- 10
-CODIGO_ASP <- 11
-
+# PROCESAMIENTO
 
 # COSTA RICA
 
-cat("Rasterizando polígono del contorno de Costa Rica ...\n")
+cat("0 Rasterizando polígono del contorno de Costa Rica ...\n")
 
 # Objeto sf de Costa Rica
 costarica_sf <-
@@ -163,9 +176,49 @@ cat("Finalizado\n\n")
 gc()
 
 
+# COBERTURA FORESTAL
+
+cat("1/12 Rasterizando datos de cobertura forestal ...\n")
+
+# Objeto sf de cobertura forestal
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_COBERTURA_FORESTAL, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de cobertura forestal
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra <- ifel(!is.na(capa_terra), CODIGO_FORESTAL, NA)
+
+# Escritura
+capa_terra |> writeRaster(
+  ARCHIVO_RASTER_COBERTURA_FORESTAL,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
 # CULTIVOS
 
-cat("Rasterizando datos de cultivos ...\n")
+cat("2/12 Rasterizando datos de cultivos ...\n")
 
 # Objeto sf de cultivos
 capa_sf <-
@@ -204,7 +257,7 @@ gc()
 
 # PIÑA
 
-cat("Rasterizando datos de piña ...\n")
+cat("3/12 Rasterizando datos de piña ...\n")
 
 # Objeto sf de piña
 capa_sf <-
@@ -243,7 +296,7 @@ gc()
 
 # PALMA
 
-cat("Rasterizando datos de palma ...\n")
+cat("4/12 Rasterizando datos de palma ...\n")
 
 # Objeto sf de palma
 capa_sf <-
@@ -282,7 +335,7 @@ gc()
 
 # PASTOS
 
-cat("Rasterizando datos de pastos ...\n")
+cat("5/12 Rasterizando datos de pastos ...\n")
 
 # Objeto sf de pastos 2019
 pastos_2019_sf <-
@@ -346,7 +399,7 @@ gc()
 
 # CAFÉ
 
-cat("Rasterizando datos de café ...\n")
+cat("6/12 Rasterizando datos de café ...\n")
 
 # Objeto sf de café
 capa_sf <-
@@ -385,7 +438,7 @@ gc()
 
 # BANANO
 
-cat("Rasterizando datos de banano ...\n")
+cat("7/12 Rasterizando datos de banano ...\n")
 
 # Objeto sf de banano
 capa_sf <-
@@ -425,7 +478,7 @@ gc()
 
 # CAÑA
 
-cat("Rasterizando datos de caña ...\n")
+cat("8/12 Rasterizando datos de caña ...\n")
 
 # Objeto sf de caña
 capa_sf <-
@@ -463,49 +516,9 @@ rm(capa_terra)
 gc()
 
 
-# COBERTURA FORESTAL
+# PATRIMONIO NATURAL DEL ESTADO (PNE)
 
-cat("Rasterizando datos de cobertura forestal ...\n")
-
-# Objeto sf de cobertura forestal
-capa_sf <-
-  st_read(ARCHIVO_VECTORIAL_COBERTURA_FORESTAL, quiet = TRUE) |>
-  st_transform(5367) |>
-  st_make_valid()
-
-# Objeto raster de cobertura forestal
-capa_terra <-
-  rasterize(capa_sf, costarica_terra)
-
-# Asignación de CRS
-crs(capa_terra) <- "EPSG:5367"
-
-# Recorte
-capa_terra <-
-  capa_terra |>
-  crop(costarica_sf) |>
-  mask(costarica_sf)
-
-# Valor de las celdas
-capa_terra <- ifel(!is.na(capa_terra), CODIGO_FORESTAL, NA)
-
-# Escritura
-capa_terra |> writeRaster(
-  ARCHIVO_RASTER_COBERTURA_FORESTAL,
-  overwrite=TRUE
-)
-
-cat("Finalizado\n\n")
-
-# Borrado de objetos innecesarios
-rm(capa_sf)
-rm(capa_terra)
-gc()
-
-
-# PATRIMO NATURAL DEL ESTADO (PNE)
-
-cat("Rasterizando datos del Patrimonio Natural del Estado (PNE) ...\n")
+cat("9/12 Rasterizando datos del Patrimonio Natural del Estado (PNE) ...\n")
 
 # Objeto sf de PNE
 capa_sf <-
@@ -545,7 +558,7 @@ gc()
 
 # REGISTRO NACIONAL DE HUMEDALES (RNH)
 
-cat("Rasterizando datos del Registro Nacional de Humedales (RNH) ...\n")
+cat("10/12 Rasterizando datos del Registro Nacional de Humedales (RNH) ...\n")
 
 # Objeto sf de RNH
 capa_sf <-
@@ -585,7 +598,7 @@ gc()
 
 # ÁREAS SILVESTRES PROTEGIDAS (ASP)
 
-cat("Rasterizando datos de Áreas Silvestres Protegidas (ASP) ...\n")
+cat("11/12 Rasterizando datos de Áreas Silvestres Protegidas (ASP) ...\n")
 
 # Objeto sf de ASP
 capa_sf <-
@@ -614,6 +627,47 @@ capa_terra <-
 # Escritura
 capa_terra |> writeRaster(
   ARCHIVO_RASTER_ASP,
+  overwrite=TRUE
+)
+
+cat("Finalizado\n\n")
+
+# Borrado de objetos innecesarios
+rm(capa_sf)
+rm(capa_terra)
+gc()
+
+
+# RED VIAL NACIONAL (RVN)
+
+cat("12/12 Rasterizando datos de Red Vial Nacional ...\n")
+
+# Objeto sf de RVN
+capa_sf <-
+  st_read(ARCHIVO_VECTORIAL_RVN, quiet = TRUE) |>
+  st_transform(5367) |>
+  st_make_valid()
+
+# Objeto raster de RVN
+capa_terra <-
+  rasterize(capa_sf, costarica_terra)
+
+# Asignación de CRS
+crs(capa_terra) <- "EPSG:5367"
+
+# Recorte
+capa_terra <-
+  capa_terra |>
+  crop(costarica_sf) |>
+  mask(costarica_sf)
+
+# Valor de las celdas
+capa_terra <-
+  ifel(!is.na(capa_terra), CODIGO_RVN, NA)
+
+# Escritura
+capa_terra |> writeRaster(
+  ARCHIVO_RASTER_RVN,
   overwrite=TRUE
 )
 
