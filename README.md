@@ -1,6 +1,8 @@
 # Desarrollo de un mapa base de uso agropecuario y bosques a nivel nacional del año 2020
 Este repositorio contiene el código fuente en lenguaje R y la documentación para generar un mapa base de uso agropecuario y bosques de Costa Rica correspondiente al año 2020. El mapa se crea a partir de la combinación de capas vectoriales y raster de cobertura forestal, cultivos, áreas silvestres protegidas y otras.
 
+![](salidas/uso-agropecuario-bosques-2020-reclasificado-comprimido.png)
+
 ## Flujo de trabajo
 
 1. Remuestreo de capas raster: `programas/remuestreo.R`
