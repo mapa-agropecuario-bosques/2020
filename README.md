@@ -57,12 +57,12 @@ docker build -t mapa-agropecuario-bosques-r-433 .
 # (el archivo con variables de ambiente debe especificarse en la opción --env-file)
 docker run -d --name mapa-agropecuario-bosques-r-433 \
   -p 8787:8787 \
-  -v /home/mfvargas/mapa-agropecuario-bosques/github/2020:/home/rstudio \
+  -v /home/mfvargas/mapa-agropecuario-bosques/github:/home/rstudio \
   --env-file /home/mfvargas/mapa-agropecuario-bosques-r-433.env \
   mapa-agropecuario-bosques-r-433
 ```
   
-### Acceso al contenedor (username=rstudio, password=biodatacr)
+### Acceso al contenedor (username=rstudio, password=mapa)
 [http://localhost:8787](http://localhost:8787)
 
 ### Detención, inicio y borrado del contenedor
