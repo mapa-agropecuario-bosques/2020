@@ -1,0 +1,16 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Desarrollo de un mapa base de uso agropecuario y bosques a nivel nacional del año 2020"
+  author: "Manuel Vargas"
+  date: "2025-01-25"
+  chapters:
+    - index.qmd
+
+format:
+  html:
+    lang: es
+    theme: cosmo
+    toc-expand: 5
